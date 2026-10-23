@@ -10,7 +10,7 @@ A Cloudflare Worker that turns GoHighLevel webhooks into a reliable lead pipelin
 Built with Claude Code, in TypeScript, with no runtime dependencies — only Workers APIs.
 
 ![Admin dashboard](docs/dashboard.png)
-*Admin page from a local run with no Google credentials set, showing how sync errors are reported.*
+*Admin page of the deployed Worker right after a manual sync: two test leads (fictional data) synced to Google Sheets, with Places enrichment off (`skipped`).*
 
 ## How it works
 
