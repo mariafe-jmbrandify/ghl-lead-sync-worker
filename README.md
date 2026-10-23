@@ -41,7 +41,9 @@ GHL workflow ──POST /webhooks/ghl?key=…──▶ Worker ──▶ D1: lead
 
 ## Google Places enrichment
 
-Optional. When `GOOGLE_PLACES_API_KEY` is set, each sync run looks up pending leads' businesses with the [Places API (New) Text Search](https://developers.google.com/maps/documentation/places/web-service/text-search) before appending them to the sheet.
+> **Optional, and needs an active Google Cloud billing account.** The Places API (New) refuses requests (HTTP 403) until billing on the key's project is active, including while a free-trial prepayment is pending. Without `GOOGLE_PLACES_API_KEY` set, leads still sync to the sheet with enrichment `skipped`. If the key is set but billing isn't active, leads still sync, marked `failed`, so leave the secret unset until billing works (`npx wrangler secret delete GOOGLE_PLACES_API_KEY`).
+
+When `GOOGLE_PLACES_API_KEY` is set, each sync run looks up pending leads' businesses with the [Places API (New) Text Search](https://developers.google.com/maps/documentation/places/web-service/text-search) before appending them to the sheet.
 
 - **Query:** GHL's `company_name` plus `city` and `state` when present, e.g. `Acme Plumbing, Austin, TX`. The top match is stored.
 - **Fields:** only `id`, `displayName`, `formattedAddress`, `rating`, `userRatingCount` and `websiteUri` are requested. Google bills by the most expensive field requested; rating, review count and website put each lookup on the **Text Search Enterprise** SKU.
@@ -93,8 +95,8 @@ open http://localhost:8787/admin                        # any username, password
      `Received, Contact ID, First name, Last name, Email, Phone, Source, Tags, Company, Address, City, State, Business name, Business address, Rating, Reviews, Website, Place ID, Enrichment`.
      (Upgrading? Add the 11 headers after `Tags`. Rows synced before the upgrade have those cells blank.)
    - Put the sheet ID (from its URL) in `SHEET_ID` in `wrangler.jsonc`.
-3. **Google Places API key** (optional, for enrichment)
-   - In the same Google Cloud project, enable **Places API (New)** and make sure billing is on.
+3. **Google Places API key** (optional, for enrichment; skip this step until billing is active)
+   - In the same Google Cloud project, make sure the project is linked to an **active** billing account (*Billing → Account management*), then enable **Places API (New)**.
    - Under *APIs & Services → Credentials*, create an API key.
    - Edit the key: under **API restrictions** choose *Restrict key* and select only **Places API (New)**. Leave *Application restrictions* at *None*: the Worker calls from Cloudflare's servers, so there's no fixed IP or referrer to pin it to.
    - Optionally set a daily quota on Places API (New) under *APIs & Services → Quotas* as a spending cap.

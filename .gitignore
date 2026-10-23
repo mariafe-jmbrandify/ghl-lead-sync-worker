@@ -5,3 +5,8 @@ node_modules/
 !.dev.vars.example
 *.log
 .DS_Store
+
+# Google credentials: never commit downloaded keys
+project-*.json
+*service-account*.json
+*.pem

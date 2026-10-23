@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "ghl-leads",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "database_id": "18b24dea-6f9f-42a1-aae8-162ede22f36a",
       "migrations_dir": "migrations"
     }
   ],
@@ -19,7 +19,7 @@
   // KV holds short-lived data: webhook de-duplication keys and the cached
   // Google access token. Run `npx wrangler kv namespace create KV`.
   "kv_namespaces": [
-    { "binding": "KV", "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" }
+    { "binding": "KV", "id": "d8307af2a30e415ab296f7f1ffe2f596" }
   ],
 
   // Push unsynced leads to Google Sheets every 5 minutes.
@@ -29,7 +29,7 @@
   // GOOGLE_SERVICE_ACCOUNT_JSON, optional GOOGLE_PLACES_API_KEY) are set
   // with `npx wrangler secret put`.
   "vars": {
-    "SHEET_ID": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID",
+    "SHEET_ID": "16aC1KOii8WRAx5iFQfpmbPUnGicNQusq2XftQolQZfI",
     "SHEET_TAB": "Leads",
     "SYNC_BATCH_SIZE": "100",
     // Most Google Places lookups per sync run; cache hits don't count.
