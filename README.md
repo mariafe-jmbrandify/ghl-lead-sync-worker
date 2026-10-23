@@ -52,7 +52,7 @@ Optional. When `GOOGLE_PLACES_API_KEY` is set, each sync run looks up pending le
 
 ## Tests
 
-37 tests run inside the real Workers runtime (Miniflare) with a real local D1 and KV:
+38 tests run inside the real Workers runtime (Miniflare) with a real local D1 and KV:
 
 ```bash
 npm install
@@ -60,7 +60,7 @@ npm run typecheck
 npm test
 ```
 
-They cover webhook auth, payload mapping, duplicates and updates, bad input, JWT signing (verified against a generated RSA key), Sheets success and failure paths, token caching and refresh, Places enrichment (found, not found, no key, errors, timeout, KV cache, no company, per-run cap), dashboard auth and HTML escaping, and the cron handler. Google is never called from tests; an injected fake `fetch` stands in.
+They cover webhook auth, payload mapping, duplicates and updates, bad input, JWT signing (verified against a generated RSA key), Sheets success and failure paths, token caching and refresh, Places enrichment (found, not found, no key, errors, timeout, KV cache, no company, per-run cap), the 0002 data migration, dashboard auth and HTML escaping, and the cron handler. Google is never called from tests; an injected fake `fetch` stands in.
 
 ## Run locally
 
