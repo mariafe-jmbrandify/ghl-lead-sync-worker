@@ -1,9 +1,14 @@
-import { getDashboardData } from "./db";
+import { getDashboardData, type LeadRow } from "./db";
 import { escapeHtml as e } from "./util";
 
 function statusBadge(status: string): string {
-  const cls = status === "success" ? "ok" : status === "error" ? "err" : "muted";
-  return `<span class="badge ${cls}">${e(status)}</span>`;
+  const cls = status === "success" || status === "found" ? "ok" : status === "error" || status === "failed" ? "err" : "muted";
+  return `<span class="badge ${cls}">${e(status.replace("_", " "))}</span>`;
+}
+
+function rating(l: LeadRow): string {
+  if (l.place_rating === null) return "—";
+  return l.place_rating_count === null ? e(l.place_rating) : `${e(l.place_rating)} (${e(l.place_rating_count)})`;
 }
 
 export async function renderDashboard(env: Env, flash?: string): Promise<Response> {
@@ -18,6 +23,9 @@ export async function renderDashboard(env: Env, flash?: string): Promise<Respons
         <td>${e(l.email ?? "—")}</td>
         <td>${e(l.phone ?? "—")}</td>
         <td>${e(l.source ?? "—")}</td>
+        <td>${e(l.place_name ?? l.company_name ?? "—")}</td>
+        <td>${rating(l)}</td>
+        <td>${statusBadge(l.enrichment_status)}</td>
         <td>${l.synced_at ? '<span class="badge ok">synced</span>' : '<span class="badge muted">pending</span>'}</td>
       </tr>`,
     )
@@ -86,7 +94,7 @@ export async function renderDashboard(env: Env, flash?: string): Promise<Respons
   <div class="table-wrap">
     ${
       data.leads.length
-        ? `<table><thead><tr><th>Received (UTC)</th><th>Name</th><th>Email</th><th>Phone</th><th>Source</th><th>Sheet</th></tr></thead><tbody>${leadRows}</tbody></table>`
+        ? `<table><thead><tr><th>Received (UTC)</th><th>Name</th><th>Email</th><th>Phone</th><th>Source</th><th>Business</th><th>Rating</th><th>Enrichment</th><th>Sheet</th></tr></thead><tbody>${leadRows}</tbody></table>`
         : `<div class="empty">No leads yet. Point a GoHighLevel workflow webhook at /webhooks/ghl.</div>`
     }
   </div>

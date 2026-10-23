@@ -1,8 +1,10 @@
 import { createExecutionContext, createScheduledController, waitOnExecutionContext } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, it } from "vitest";
-import { upsertLead } from "../src/db";
+import { saveEnrichments, upsertLead } from "../src/db";
 import worker from "../src/index";
+
+const noBusiness = { companyName: null, address1: null, city: null, state: null };
 
 function basic(password: string) {
   return { authorization: `Basic ${btoa(`admin:${password}`)}` };
@@ -38,7 +40,7 @@ describe("admin dashboard", () => {
   it("lists leads with HTML escaped", async () => {
     await upsertLead(
       env.DB,
-      { contactId: "x1", firstName: "<script>alert(1)</script>", lastName: null, email: "x@y.com", phone: null, source: "form", tags: null, locationId: null },
+      { contactId: "x1", firstName: "<script>alert(1)</script>", lastName: null, email: "x@y.com", phone: null, source: "form", tags: null, locationId: null, ...noBusiness },
       "{}",
     );
     const res = await call("/admin", { headers: basic("test-admin-token") });
@@ -50,10 +52,30 @@ describe("admin dashboard", () => {
     expect(html).toContain("x@y.com");
   });
 
+  it("shows business name, rating and enrichment status, escaped", async () => {
+    await upsertLead(
+      env.DB,
+      { contactId: "b1", firstName: "Bo", lastName: null, email: null, phone: null, source: null, tags: null, locationId: null, ...noBusiness },
+      "{}",
+    );
+    const { id } = (await env.DB.prepare("SELECT id FROM leads WHERE contact_id = 'b1'").first<{ id: number }>())!;
+    await saveEnrichments(
+      env.DB,
+      [{ id, result: { status: "found", placeName: "<b>Acme</b> & Sons", placeRating: 4.6, placeRatingCount: 128 } }],
+      "2026-10-23T00:00:00.000Z",
+    );
+    const html = await (await call("/admin", { headers: basic("test-admin-token") })).text();
+    expect(html).toContain("<th>Business</th><th>Rating</th><th>Enrichment</th>");
+    expect(html).toContain("&lt;b&gt;Acme&lt;/b&gt; &amp; Sons");
+    expect(html).not.toContain("<b>Acme</b>");
+    expect(html).toContain("4.6 (128)");
+    expect(html).toContain('<span class="badge ok">found</span>');
+  });
+
   it("shows the outcome of a manual sync", async () => {
     await upsertLead(
       env.DB,
-      { contactId: "m1", firstName: "Ann", lastName: null, email: null, phone: null, source: null, tags: null, locationId: null },
+      { contactId: "m1", firstName: "Ann", lastName: null, email: null, phone: null, source: null, tags: null, locationId: null, ...noBusiness },
       "{}",
     );
     // Test env has no real Google credentials, so the sync fails safely.

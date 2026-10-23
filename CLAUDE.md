@@ -31,7 +31,8 @@ GHL workflow ──POST /webhooks/ghl──▶ Worker ──▶ D1 (leads, sync_
 - `src/webhook.ts` — secret check, payload validation, GHL field mapping, KV de-dupe
 - `src/db.ts` — every SQL query lives here; nothing else talks to D1 directly
 - `src/sheets.ts` — Google service-account JWT (WebCrypto) and Sheets append
-- `src/sync.ts` — batch sync: read pending → append → mark synced → log run
+- `src/places.ts` — Google Places (New) Text Search, KV result cache, per-lead enrichment
+- `src/sync.ts` — batch sync: read pending → enrich → append → mark synced → log run
 - `src/admin.ts` — server-rendered dashboard HTML
 - `migrations/` — numbered D1 migrations; never edit one that has been applied, add a new file
 - `test/` — one test file per area; `test/apply-migrations.ts` sets up the schema
@@ -44,8 +45,8 @@ GHL workflow ──POST /webhooks/ghl──▶ Worker ──▶ D1 (leads, sync_
    only done when `npm run typecheck` and `npm test` both pass.
 3. **No real network in tests.** External calls go through an injectable `fetchFn`;
    tests pass a fake. Never hit Google or GHL from the test suite.
-4. **Secrets never in code.** `GHL_WEBHOOK_SECRET`, `ADMIN_TOKEN` and
-   `GOOGLE_SERVICE_ACCOUNT_JSON` come from `wrangler secret put` (prod) or
+4. **Secrets never in code.** `GHL_WEBHOOK_SECRET`, `ADMIN_TOKEN`,
+   `GOOGLE_SERVICE_ACCOUNT_JSON` and `GOOGLE_PLACES_API_KEY` come from `wrangler secret put` (prod) or
    `.dev.vars` (local, gitignored). Never log secret values or full payloads.
 5. **Fail safe.** Leads are marked synced only after Google confirms the write.
    A failed run must leave data retryable and record the error in `sync_runs`.

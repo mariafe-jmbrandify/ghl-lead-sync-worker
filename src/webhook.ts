@@ -36,6 +36,10 @@ export function normalizeLead(body: Payload): LeadInput | null {
     source: str(body.contact_source ?? body.source),
     tags: tags || null,
     locationId: str(location.id ?? body.location_id ?? body.locationId),
+    companyName: str(body.company_name ?? body.companyName),
+    address1: str(body.address1),
+    city: str(body.city),
+    state: str(body.state),
   };
 }
 

@@ -64,7 +64,7 @@ function fakeGoogle(sheetsStatus = 200) {
 async function seed(id: string, first: string) {
   await upsertLead(
     env.DB,
-    { contactId: id, firstName: first, lastName: "Test", email: `${id}@x.com`, phone: null, source: "web", tags: null, locationId: null },
+    { contactId: id, firstName: first, lastName: "Test", email: `${id}@x.com`, phone: null, source: "web", tags: null, locationId: null, companyName: null, address1: null, city: null, state: null },
     "{}",
   );
 }

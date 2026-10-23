@@ -8,6 +8,7 @@ const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const TOKEN_CACHE_KEY = "google:access_token";
 
 export type FetchFn = typeof fetch;
+export type Cell = string | number | null;
 
 interface ServiceAccount {
   client_email: string;
@@ -102,7 +103,7 @@ export async function getAccessToken(env: Env, fetchFn: FetchFn): Promise<string
  */
 export async function appendRows(
   env: Env,
-  rows: (string | null)[][],
+  rows: Cell[][],
   fetchFn: FetchFn,
 ): Promise<void> {
   const token = await getAccessToken(env, fetchFn);

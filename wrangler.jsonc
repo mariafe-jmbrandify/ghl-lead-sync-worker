@@ -26,10 +26,13 @@
   "triggers": { "crons": ["*/5 * * * *"] },
 
   // Non-secret settings. Secrets (GHL_WEBHOOK_SECRET, ADMIN_TOKEN,
-  // GOOGLE_SERVICE_ACCOUNT_JSON) are set with `npx wrangler secret put`.
+  // GOOGLE_SERVICE_ACCOUNT_JSON, optional GOOGLE_PLACES_API_KEY) are set
+  // with `npx wrangler secret put`.
   "vars": {
     "SHEET_ID": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID",
     "SHEET_TAB": "Leads",
-    "SYNC_BATCH_SIZE": "100"
+    "SYNC_BATCH_SIZE": "100",
+    // Most Google Places lookups per sync run; cache hits don't count.
+    "PLACES_MAX_PER_RUN": "25"
   }
 }

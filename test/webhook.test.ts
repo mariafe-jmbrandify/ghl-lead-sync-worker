@@ -31,6 +31,10 @@ const ghlPayload = {
   tags: ["new lead", "facebook"],
   contact_source: "Facebook Lead Ad",
   location: { id: "loc_9", name: "Test Agency" },
+  company_name: "Reyes Plumbing",
+  address1: "12 Main St",
+  city: "Austin",
+  state: "TX",
 };
 
 describe("normalizeLead", () => {
@@ -44,12 +48,25 @@ describe("normalizeLead", () => {
       source: "Facebook Lead Ad",
       tags: "new lead, facebook",
       locationId: "loc_9",
+      companyName: "Reyes Plumbing",
+      address1: "12 Main St",
+      city: "Austin",
+      state: "TX",
     });
   });
 
   it("accepts camelCase variants", () => {
-    const lead = normalizeLead({ contactId: "x1", firstName: "Jo", locationId: "L1", tags: "vip" });
-    expect(lead).toMatchObject({ contactId: "x1", firstName: "Jo", locationId: "L1", tags: "vip" });
+    const lead = normalizeLead({ contactId: "x1", firstName: "Jo", locationId: "L1", tags: "vip", companyName: " Jo's Bakery " });
+    expect(lead).toMatchObject({ contactId: "x1", firstName: "Jo", locationId: "L1", tags: "vip", companyName: "Jo's Bakery" });
+  });
+
+  it("leaves business fields null when GHL omits them", () => {
+    expect(normalizeLead({ contact_id: "n1", company_name: "  " })).toMatchObject({
+      companyName: null,
+      address1: null,
+      city: null,
+      state: null,
+    });
   });
 
   it("returns null without a contact id", () => {
@@ -80,8 +97,19 @@ describe("POST /webhooks/ghl", () => {
       email: "ana.reyes@example.com",
       tags: "new lead, facebook",
       location_id: "loc_9",
+      company_name: "Reyes Plumbing",
+      address1: "12 Main St",
+      city: "Austin",
+      state: "TX",
+      enrichment_status: "pending",
       synced_at: null,
     });
+  });
+
+  it("stores camelCase business fields from a custom webhook", async () => {
+    await send({ contactId: "cc_1", companyName: "Jo's Bakery", address1: "5 Elm St", city: "Reno", state: "NV" });
+    const row = await env.DB.prepare("SELECT * FROM leads WHERE contact_id = ?").bind("cc_1").first();
+    expect(row).toMatchObject({ company_name: "Jo's Bakery", address1: "5 Elm St", city: "Reno", state: "NV" });
   });
 
   it("acknowledges an identical retry without writing again", async () => {
