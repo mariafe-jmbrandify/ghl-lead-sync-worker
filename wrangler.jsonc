@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ghl-lead-sync-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-15",
+  "observability": { "enabled": true },
+
+  // Leads and sync history live in D1. Run `npx wrangler d1 create ghl-leads`
+  // and paste the returned database_id here before deploying.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ghl-leads",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // KV holds short-lived data: webhook de-duplication keys and the cached
+  // Google access token. Run `npx wrangler kv namespace create KV`.
+  "kv_namespaces": [
+    { "binding": "KV", "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" }
+  ],
+
+  // Push unsynced leads to Google Sheets every 5 minutes.
+  "triggers": { "crons": ["*/5 * * * *"] },
+
+  // Non-secret settings. Secrets (GHL_WEBHOOK_SECRET, ADMIN_TOKEN,
+  // GOOGLE_SERVICE_ACCOUNT_JSON) are set with `npx wrangler secret put`.
+  "vars": {
+    "SHEET_ID": "REPLACE_WITH_YOUR_GOOGLE_SHEET_ID",
+    "SHEET_TAB": "Leads",
+    "SYNC_BATCH_SIZE": "100"
+  }
+}

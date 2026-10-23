@@ -1,0 +1,24 @@
+{
+  "name": "ghl-lead-sync-worker",
+  "version": "1.0.0",
+  "description": "GoHighLevel webhook -> Cloudflare D1 -> Google Sheets lead sync, with an admin dashboard. Built with Claude Code.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "cf-typegen": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply ghl-leads --local",
+    "db:migrate:remote": "wrangler d1 migrations apply ghl-leads --remote"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.7",
+    "@cloudflare/workers-types": "^5.20261023.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.12",
+    "wrangler": "^4.152.0"
+  },
+  "private": true,
+  "type": "module"
+}
