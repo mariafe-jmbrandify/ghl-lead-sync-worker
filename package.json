@@ -20,5 +20,9 @@
     "wrangler": "^4.152.0"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261019.1": true
+  }
 }
